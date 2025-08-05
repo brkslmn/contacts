@@ -185,6 +185,23 @@ public class ContactsPlugin: CAPPlugin, CNContactPickerDelegate {
         }
     }
 
+    public func contactPicker(_ picker: CNContactPickerViewController, didSelect selectedContact: CNContact) {
+        let call = self.bridge?.savedCall(withID: self.pickContactCallbackId ?? "")
+
+        guard let call = call else {
+            return
+        }
+
+        let contact = ContactPayload(selectedContact.identifier)
+        contact.fillData(selectedContact)
+
+        call.resolve([
+            "contact": contact.getJSObject()
+        ])
+
+        self.bridge?.releaseCall(call)
+    }
+
     public func contactPicker(_ picker: CNContactPickerViewController, didSelect contacts: [CNContact]) {
         let call = self.bridge?.savedCall(withID: self.pickContactCallbackId ?? "")
 
